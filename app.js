@@ -1,9 +1,24 @@
+// npm
 const inquirer = require('inquirer');
-console.log(inquirer);
-
+// core
 // fs stands for "file system", a Node module that can create multiple file types, including TXT, PDF, HTML & JSON
 // require is a built in global function of Node that allows this script to access the fs module functions
 // const fs = require('fs');
+// personal
+
+// Note that inquirer can recieve an array of prompts
+const promptUser = () => {
+    return inquirer
+    .prompt([
+        {
+            type: 'input',
+            name: 'name',
+            message: 'What is your name?'
+        }
+    ]);
+}
+
+promptUser().then(answers => console.log(answers));
 // const generatePage = require('./src/page-template.js');
 
 // const pageHTML = generatePage(userName, gitHub);

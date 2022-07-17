@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/gitJanaeW/portfolio-generator#readme",
   "dependencies": {
-    "inquirer": "^9.0.1"
+    "inquirer": "^8.2.4"
   }
 }
