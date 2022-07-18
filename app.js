@@ -25,15 +25,7 @@ const promptUser = () => {
             name: 'about',
             message: 'Provide some information about yourself'
         }
-    ]).then(projectData => {
-        // determines what will happen if user confirms that they want to add more projects
-        portfolioData.projects.push(projectData);
-        if (projectData.confirmAddProject) {
-            return promptProject(portfolioData);
-        } else {
-            return portfolioData;
-        }
-    });
+    ])
 }
 
 const promptProject = portfolioData => {
@@ -77,7 +69,15 @@ const promptProject = portfolioData => {
             message: 'Would you like to enter another project?',
             default: false
         }
-    ]);
+    ]).then(projectData => {
+        // determines what will happen if user confirms that they want to add more projects
+        portfolioData.projects.push(projectData);
+        if (projectData.confirmAddProject) {
+            return promptProject(portfolioData);
+        } else {
+            return portfolioData;
+        }
+    });
 };
 
 // Using .then here instead of in the functions themselves allows us to better control when the console.log is deployed
