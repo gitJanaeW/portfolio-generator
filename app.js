@@ -27,7 +27,7 @@ const promptUser = () => {
         }
     ])
 }
-
+// What is portfolioData doing? Why can it just have an array attached to it?
 const promptProject = portfolioData => {
     portfolioData.projects = portfolioData.projects || [];
     console.log(`
@@ -84,7 +84,11 @@ const promptProject = portfolioData => {
 promptUser()
     .then(promptProject)
     .then(portfolioData => {
-        console.log(portfolioData);
+        console.log(`
+        ==============
+        Your Projects: 
+        ==============
+        ` + portfolioData);
     });
 
 
