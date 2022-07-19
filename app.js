@@ -13,21 +13,51 @@ const promptUser = () => {
         {
             type: 'input',
             name: 'name',
-            message: 'What is your name?'
+            message: 'What is your name? (Required)',
+            validate: nameInput => {
+                if (nameInput){
+                    return true;
+                }else{
+                    console.log('Please enter your name.');
+                    return false;
+                }
+            }
         },
         {
             type: 'input',
             name: 'github',
-            message: 'Enter your GitHUb Username'
+            message: 'Enter your GitHub Username. (Required)',
+            validate: nameInput => {
+                if (nameInput){
+                    return true;
+                }else{
+                    console.log('Please enter your GitHub Username.');
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'confirm',
+            name: 'confirmAbout',
+            message: 'Would you like to enter some information about yourself for an "About" section?',
+            default: false
         },
         {
             type: 'input',
             name: 'about',
-            message: 'Provide some information about yourself'
+            message: 'Provide some information about yourself.',
+            when: ({confirmAbout}) => {
+                if (confirmAbout){
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
     ])
+        
 }
-// What is portfolioData doing? Why can it just have an array attached to it?
+// What is portfolioData doing/where does it come from? Why can it just have an array attached to it?
 const promptProject = portfolioData => {
     portfolioData.projects = portfolioData.projects || [];
     console.log(`
@@ -44,9 +74,17 @@ const promptProject = portfolioData => {
         {
             type: 'input',
             name: 'description',
-            message: 'Provide a description of the project (Required)'
+            message: 'Provide a description of the project. (Required)',
+            validate: nameInput => {
+                if (nameInput){
+                    return true;
+                }else{
+                    console.log('Please enter some information about your project.');
+                    return false;
+                }
+            }
         },
-        { // No/all choces are both valid entries with 'checkbox'
+        { // No/all choices are both valid entries with 'checkbox'
             type: 'checkbox',
             name: 'languages',
             message: 'What did you build this project with? (Check all that apply)',
@@ -55,7 +93,15 @@ const promptProject = portfolioData => {
         {
             type: 'input',
             name: 'link',
-            message: 'Enter the GitHub link to your project (Required)'
+            message: 'Enter the GitHub link to your project (Required)',
+            validate: nameInput => {
+                if (nameInput){
+                    return true;
+                }else{
+                    console.log('Please enter your project link.');
+                    return false;
+                }
+            }
         },
         {
             type: 'confirm',
@@ -87,8 +133,9 @@ promptUser()
         console.log(`
         ==============
         Your Projects: 
-        ==============
-        ` + portfolioData);
+        ==============~
+        `);
+        console.log(portfolioData);
     });
 
 
