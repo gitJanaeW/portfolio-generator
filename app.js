@@ -7,7 +7,8 @@ const fs = require('fs');
 
 // personal
 const generatePage = require('./src/page-template.js');
-
+// This is object deconstruction. Instead of using generateSite.writeFile, we're now able to just write writeFile
+const {writeFile, copyFile} = require('./utils/generate-site.js');
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -16,9 +17,9 @@ const promptUser = () => {
             name: 'name',
             message: 'What is your name? (Required)',
             validate: nameInput => {
-                if (nameInput){
+                if (nameInput) {
                     return true;
-                }else{
+                } else {
                     console.log('Please enter your name.');
                     return false;
                 }
@@ -28,10 +29,10 @@ const promptUser = () => {
             type: 'input',
             name: 'github',
             message: 'Enter your GitHub Username. (Required)',
-            validate: nameInput => {
-                if (nameInput){
+            validate: gitHubInput => {
+                if (gitHubInput) {
                     return true;
-                }else{
+                } else {
                     console.log('Please enter your GitHub Username.');
                     return false;
                 }
@@ -47,13 +48,7 @@ const promptUser = () => {
             type: 'input',
             name: 'about',
             message: 'Provide some information about yourself.',
-            when: ({confirmAbout}) => {
-                if (confirmAbout){
-                    return true;
-                } else {
-                    return false;
-                }
-            }
+            when: ({confirmAbout}) => confirmAbout
         }
     ]);
         
@@ -144,80 +139,37 @@ const promptProject = portfolioData => {
     });
 };
 
-const mockData = {
-    name: 'Lernantino',
-    github: 'lernantino',
-    confirmAbout: true,
-    about:
-      'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et.',
-    projects: [
-      {
-        name: 'Run Buddy',
-        description:
-          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et. Nam fringilla elit dapibus pellentesque cursus.',
-        languages: ['HTML', 'CSS'],
-        link: 'https://github.com/lernantino/run-buddy',
-        feature: true,
-        confirmAddProject: true
-      },
-      {
-        name: 'Taskinator',
-        description:
-          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et. Nam fringilla elit dapibus pellentesque cursus.',
-        languages: ['JavaScript', 'HTML', 'CSS'],
-        link: 'https://github.com/lernantino/taskinator',
-        feature: true,
-        confirmAddProject: true
-      },
-      {
-        name: 'Taskmaster Pro',
-        description:
-          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et. Nam fringilla elit dapibus pellentesque cursus.',
-        languages: ['JavaScript', 'jQuery', 'CSS', 'HTML', 'Bootstrap'],
-        link: 'https://github.com/lernantino/taskmaster-pro',
-        feature: false,
-        confirmAddProject: true
-      },
-      {
-        name: 'Robot Gladiators',
-        description:
-          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque.',
-        languages: ['JavaScript'],
-        link: 'https://github.com/lernantino/robot-gladiators',
-        feature: false,
-        confirmAddProject: false
-      }
-    ]
-  };
-
 // Using .then here instead of in the functions themselves allows us to better control when the console.log is deployed
 promptUser()
     .then(promptProject)
     .then(portfolioData => {
-        const pageHTML = generatePage(portfolioData);
-        // The arguments required for fs.writeFile: file name/type, the data that will be written onto the file, a callback function used for error handling
-        fs.writeFile('./index.html', pageHTML, err =>{
-            if (err) throw new Error (err);
-            console.log('Portfolio complete! Check out index.html to see the output!');
-        });
+        return generatePage(portfolioData);
+    })
+    .then(pageHTML => {
+        return writeFile(pageHTML);
+    })
+    .then(writeFileResponse => {
+        console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse => {
+        console.log(copyFileResponse);
+    })
+    .then(err => {
+        console.log(err);
     });
 
+// const pageHTML = generatePage(portfolioData);
+//         // The arguments required for fs.writeFile: file name/type, the data that will be written onto the file, a callback function used for error handling
+//     fs.writeFile('./dist/index.html', pageHTML, err =>{
+//         if (err) throw new Error (err);
+//         console.log('Portfolio complete! Check out index.html to see the output!');
 
-
-
-// ASSIGNMENT DECONSTRUCTION
-// this is an assignment deconstruction. It assigns a variable name to a index of an array
-// const [userName, github] = profileDataArgs;
-
-
-// GETTING USER DATA
-// slice is added to skip the part of the array that would return Node.js' and this app's relative paths
-// process.argv.length allows us to right as many argv values as we want
-// const profileDataArgs = process.argv.slice(2);
-
-// EXAMPLE OF ARROW FUNCTION
-// const printProfileData = (profileDataArr) => {
-//     profileDataArr.forEach((profileItem) => console.log(profileItem));
-// }
-
-// printProfileData(profileDataArgs);
+//         fs.copyFile('./src/style.css', './dist/style.css', err => {
+//             if (err) {
+//                 console.log(err);
+//                 return;
+//             }
+//             console.log ('Style sheer copied successfully.');
+//         });
+//     });
