@@ -3,13 +3,14 @@ const inquirer = require('inquirer');
 // core
 // fs stands for "file system", a Node module that can create multiple file types, including TXT, PDF, HTML & JSON
 // require is a built in global function of Node that allows this script to access the fs module functions
-// const fs = require('fs');
-// personal
+const fs = require('fs');
 
-// Note that inquirer can recieve an array of prompts
+// personal
+const generatePage = require('./src/page-template.js');
+
+
 const promptUser = () => {
-    return inquirer
-    .prompt([
+    return inquirer.prompt([
         {
             type: 'input',
             name: 'name',
@@ -54,11 +55,12 @@ const promptUser = () => {
                 }
             }
         }
-    ])
+    ]);
         
 }
-// What is portfolioData doing/where does it come from? Why can it just have an array attached to it?
+
 const promptProject = portfolioData => {
+    // If there's no 'project' array property, create one
     portfolioData.projects = portfolioData.projects || [];
     console.log(`
     =================
@@ -69,16 +71,24 @@ const promptProject = portfolioData => {
         {
             type: 'input',
             name: 'name',
-            message: 'What is the name of your project?'
+            message: 'What is the name of your project?',
+            validate: nameInput => {
+                if (nameInput) {
+                    return true;
+                } else {
+                    console.log('You need to enter a project name.');
+                    return false;
+                }
+            }
         },
         {
             type: 'input',
             name: 'description',
             message: 'Provide a description of the project. (Required)',
-            validate: nameInput => {
-                if (nameInput){
+            validate: descriptionInput => {
+                if (descriptionInput){
                     return true;
-                }else{
+                } else {
                     console.log('Please enter some information about your project.');
                     return false;
                 }
@@ -88,17 +98,25 @@ const promptProject = portfolioData => {
             type: 'checkbox',
             name: 'languages',
             message: 'What did you build this project with? (Check all that apply)',
-            choices: ['JavaScript', 'HTML', 'CSS', 'ES6', 'jQuery', 'Bootstrap', 'Node.js']
+            choices: ['JavaScript', 'HTML', 'CSS', 'ES6', 'jQuery', 'Bootstrap', 'Node.js'],
+            validate: languagesInput => {
+                if (languagesInput) {
+                    return true;
+                } else {
+                    console.log('You need to enter languages you used.')
+                    return false;
+                }
+            }
         },
         {
             type: 'input',
             name: 'link',
             message: 'Enter the GitHub link to your project (Required)',
-            validate: nameInput => {
-                if (nameInput){
+            validate: linkedInput => {
+                if (linkedInput){
                     return true;
                 }else{
-                    console.log('Please enter your project link.');
+                    console.log('Please enter your GitHub project link.');
                     return false;
                 }
             }
@@ -126,32 +144,65 @@ const promptProject = portfolioData => {
     });
 };
 
+const mockData = {
+    name: 'Lernantino',
+    github: 'lernantino',
+    confirmAbout: true,
+    about:
+      'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et.',
+    projects: [
+      {
+        name: 'Run Buddy',
+        description:
+          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et. Nam fringilla elit dapibus pellentesque cursus.',
+        languages: ['HTML', 'CSS'],
+        link: 'https://github.com/lernantino/run-buddy',
+        feature: true,
+        confirmAddProject: true
+      },
+      {
+        name: 'Taskinator',
+        description:
+          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et. Nam fringilla elit dapibus pellentesque cursus.',
+        languages: ['JavaScript', 'HTML', 'CSS'],
+        link: 'https://github.com/lernantino/taskinator',
+        feature: true,
+        confirmAddProject: true
+      },
+      {
+        name: 'Taskmaster Pro',
+        description:
+          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque. Nulla eget fringilla nulla. Integer gravida magna mi, id efficitur metus tempus et. Nam fringilla elit dapibus pellentesque cursus.',
+        languages: ['JavaScript', 'jQuery', 'CSS', 'HTML', 'Bootstrap'],
+        link: 'https://github.com/lernantino/taskmaster-pro',
+        feature: false,
+        confirmAddProject: true
+      },
+      {
+        name: 'Robot Gladiators',
+        description:
+          'Duis consectetur nunc nunc. Morbi finibus non sapien nec pharetra. Fusce nec dignissim orci, ac interdum ipsum. Morbi mattis justo sed commodo pellentesque.',
+        languages: ['JavaScript'],
+        link: 'https://github.com/lernantino/robot-gladiators',
+        feature: false,
+        confirmAddProject: false
+      }
+    ]
+  };
+
 // Using .then here instead of in the functions themselves allows us to better control when the console.log is deployed
 promptUser()
     .then(promptProject)
     .then(portfolioData => {
-        console.log(`
-        ==============
-        Your Projects: 
-        ==============~
-        `);
-        console.log(portfolioData);
+        const pageHTML = generatePage(portfolioData);
+        // The arguments required for fs.writeFile: file name/type, the data that will be written onto the file, a callback function used for error handling
+        fs.writeFile('./index.html', pageHTML, err =>{
+            if (err) throw new Error (err);
+            console.log('Portfolio complete! Check out index.html to see the output!');
+        });
     });
 
 
-
-
-
-
-// const generatePage = require('./src/page-template.js');
-
-// const pageHTML = generatePage(userName, gitHub);
-
-// // The arguments required for fs.writeFile: file name/type, the data that will be written onto the file, a callback function used for error handling
-// fs.writeFile('./index.html', pageHTML, err =>{
-//     if (err) throw err;
-//     console.log('Portfolio complete! Check out index.html to see the output!');
-// });
 
 
 // ASSIGNMENT DECONSTRUCTION
